@@ -195,11 +195,11 @@ export function GameScreen({ game, slot, onExit }: { game: Game; slot: number; o
     const loop = (now: number) => {
       if (!alive) return;
       const dt = (now - last) / 1000;
-      last = now;
       const covered = uiCoverRef.current;
       const blocked = covered.menu || covered.story || covered.intro || covered.mp || covered.weather;
       frameNo++;
       if (blocked) {
+        last = now;
         g.update(dt);
         raf = requestAnimationFrame(loop);
         return;
@@ -208,6 +208,7 @@ export function GameScreen({ game, slot, onExit }: { game: Game; slot: number; o
         raf = requestAnimationFrame(loop);
         return;
       }
+      last = now;
       g.update(dt);
       if (isAssetsReady()) {
         g.render(ctx, qdpr);
