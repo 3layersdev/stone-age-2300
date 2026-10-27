@@ -19,7 +19,7 @@ export function IntroModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md pointer-events-auto">
-      <div className="hud-panel relative flex flex-col w-full max-w-2xl max-h-[92vh] rounded-xl border-primary/60 shadow-[0_0_50px_rgba(234,179,8,0.25)] overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      <div className="hud-panel relative flex flex-col w-full max-w-2xl modal-max rounded-xl border-primary/60 shadow-[0_0_50px_rgba(234,179,8,0.25)] overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         {/* Banner Hero */}
         <div className="relative border-b border-hud-edge bg-gradient-to-b from-primary/20 via-black/40 to-black/80 p-5 sm:p-6 text-center">
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-primary/50 bg-black/60 shadow-[0_0_20px_rgba(234,179,8,0.4)] mb-3">
@@ -34,7 +34,7 @@ export function IntroModal({
         </div>
 
         {/* Feature Cards Grid */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-5 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+        <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4 sm:p-5 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
           <div className="p-3 rounded-lg border border-hud-edge/60 bg-black/40 space-y-1">
             <div className="flex items-center gap-2 font-display text-primary font-bold">
               <Wheat className="h-4 w-4" />

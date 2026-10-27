@@ -85,6 +85,16 @@
   border: 1px solid var(--hud-edge);
 }
 
+.page-fill {
+  height: 100vh;
+  height: 100dvh;
+}
+
+.modal-max {
+  max-height: 86vh;
+  max-height: 86dvh;
+}
+
 .hud-ui-layer {
   touch-action: pan-x pan-y;
   -webkit-font-smoothing: antialiased;

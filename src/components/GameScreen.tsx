@@ -1641,7 +1641,7 @@ export function GameScreen({ game, slot, onExit }: { game: Game; slot: number; o
           onClick={() => setWeatherModalOpen(false)}
         >
           <div
-            className="hud-panel relative w-full max-w-lg rounded-lg p-4 sm:p-5 shadow-2xl border-primary/50 max-h-[92vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-150"
+            className="hud-panel relative w-full max-w-lg rounded-lg p-4 sm:p-5 shadow-2xl border-primary/50 modal-max overflow-y-auto overscroll-contain animate-in fade-in zoom-in-95 duration-150"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
@@ -1792,7 +1792,7 @@ export function GameScreen({ game, slot, onExit }: { game: Game; slot: number; o
           ========================================================================= */}
       {story && (
         <div className="pointer-events-auto absolute inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-          <div className="hud-panel flex max-h-[92dvh] w-[min(760px,94vw)] flex-col gap-4 overflow-y-auto rounded-lg p-5 sm:flex-row sm:gap-6 sm:p-8 shadow-2xl border-primary/50">
+          <div className="hud-panel flex modal-max w-[min(760px,94vw)] flex-col gap-4 overflow-y-auto rounded-lg p-5 sm:flex-row sm:gap-6 sm:p-8 shadow-2xl border-primary/50">
             <img
               src={story.kind === "defeat" ? pRaider : pElder}
               alt=""
@@ -1831,7 +1831,7 @@ export function GameScreen({ game, slot, onExit }: { game: Game; slot: number; o
           ========================================================================= */}
       {menu && (
         <div className="pointer-events-auto absolute inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-md p-4">
-          <div className="hud-panel max-h-[92dvh] w-[min(22rem,94vw)] overflow-y-auto rounded-lg p-6 shadow-2xl border-primary/40">
+          <div className="hud-panel modal-max w-[min(22rem,94vw)] overflow-y-auto rounded-lg p-6 shadow-2xl border-primary/40">
             <h2 className="mb-4 text-center font-display text-2xl font-bold bronze-text">Tribal Council Menu</h2>
             <div className="grid gap-2.5">
               <button className="bronze-btn rounded-md py-2.5 font-display text-sm font-bold text-primary cursor-pointer" onClick={() => { setMenu(false); g.paused = false; audio.play("click"); }}>
