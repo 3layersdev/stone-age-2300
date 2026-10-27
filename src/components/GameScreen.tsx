@@ -1134,14 +1134,22 @@ export function GameScreen({ game, slot, onExit }: { game: Game; slot: number; o
         ))}
       </div>
 
-      {/* Cataclysm / Disaster Banners */}
-      {g.disasterBanner && (
-        <div className="pointer-events-none absolute left-1/2 top-16 sm:top-20 z-20 -translate-x-1/2 text-center">
-          <div className="font-display text-xl sm:text-4xl font-black tracking-[0.25em] text-accent drop-shadow-[0_5px_15px_rgba(239,68,68,0.8)] animate-pulse">
-            {g.disasterBanner}
+      {/* Weather & Cataclysm Banner: compact chip, crisp on mobile, no pulse/glow */}
+      {g.disasterBanner && (() => {
+        const w = Object.values(WEATHER_CONFIGS).find((c) => c.bannerTitle === g.disasterBanner);
+        const col = w?.themeColor ?? "#ef4444";
+        const Ico = w ? (w.type === "rain" ? CloudRain : w.type === "snow" ? Snowflake : w.type === "ash_storm" ? Flame : Sun) : AlertTriangle;
+        return (
+          <div className="pointer-events-none absolute left-1/2 top-24 sm:top-20 z-20 -translate-x-1/2">
+            <div className="hud-panel flex items-center gap-1.5 rounded-md border px-3 py-1 shadow-xl animate-[bannerIn_.35s_ease-out] sm:px-4 sm:py-1.5" style={{ borderColor: `${col}59`, boxShadow: `0 0 16px ${col}40` }}>
+              <Ico className="h-3 w-3 sm:h-3.5 sm:w-3.5" style={{ color: col }} />
+              <span className="font-display text-[11px] sm:text-xl font-black tracking-[0.22em] drop-shadow-[0_1px_2px_rgba(0,0,0,0.95)]" style={{ color: col }}>
+                {g.disasterBanner}
+              </span>
+            </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
       {(g.raidWarn > 0 || g.raidActive) && (
         <div className="pointer-events-none absolute left-1/2 top-11 sm:top-14 z-30 -translate-x-1/2 animate-pulse">
           <div className="relative flex items-center justify-center">
