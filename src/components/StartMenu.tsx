@@ -199,8 +199,8 @@ export function StartMenu({ onNew, onLoad }: Props) {
       </div>
 
       {panel && (
-        <div className="fixed inset-0 z-20 flex items-center justify-center p-3 sm:p-4 bg-background/80 backdrop-blur-sm">
-          <div className="hud-panel modal-max relative w-[min(560px,94vw)] overflow-y-auto overscroll-contain rounded-md p-4 sm:p-7">
+        <div className="fixed inset-0 z-20 flex justify-center overflow-y-auto overscroll-contain p-3 sm:p-4 bg-background/80 backdrop-blur-sm">
+          <div className="hud-panel modal-max my-auto relative w-[min(560px,94vw)] overflow-y-auto overscroll-contain rounded-md p-4 sm:p-7">
             <button onClick={() => handleAction(() => setPanel(null))} className="absolute right-3 top-3 p-1.5 text-muted-foreground hover:text-foreground rounded transition-colors" aria-label="Close"><X className="h-5 w-5" /></button>
             {panel === "new" && (
               <>

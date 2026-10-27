@@ -92,7 +92,7 @@ export class Game {
   age = 0; ageProgress = -1; time = 0; missionIndex = 0; nid = 1; msgId = 1;
   stats = { soldiersTrained: 0, villagersTrained: 0, raidsDefeated: 0, buildingsBuilt: 0 };
   nextRaid = 300; nextDisaster = 200; raidWave = 0; raidActive = false; raidWarn = 0; raidDir = "";
-  drought = 0; flood = 0; shake = 0; disasterBanner = ""; disasterT = 0; meteor: { x: number; y: number; t: number } | null = null;
+  drought = 0; flood = 0; shake = 0; lowFX = false; private _cc: string[] = []; private _ccDrought = false; disasterBanner = ""; disasterT = 0; meteor: { x: number; y: number; t: number } | null = null;
   cam = { x: 0, y: 0 }; zoom = 1; vw = 1280; vh = 720;
   edgePan = true;
   placing: string | null = null; dragStart: { x: number; y: number } | null = null;
@@ -2360,13 +2360,22 @@ export class Game {
       if (t === TER.WATER) {
         const s = Math.sin(tm * 1.5 + x * 0.6 + y * 0.4) * 4;
         col = `hsl(200,52%,${30 + v * 4 + s}%)`;
-      } else if (t === TER.SAND) col = `hsl(42,42%,${62 + v * 5}%)`;
-      else if (t === TER.FOREST) col = `hsl(98,34%,${24 + v * 4}%)`;
-      else if (t === TER.MOUNTAIN) col = `hsl(30,8%,${40 + v * 12}%)`;
-      else if (t === TER.MARSH) col = `hsl(75,28%,${26 + v * 5}%)`;
-      else if (t === TER.STONE || t === TER.GOLD) col = `hsl(80,18%,${38 + v * 5}%)`;
-      else col = `hsl(${86 + v * 16},${34 + (this.drought > 0 ? -12 : 0)}%,${33 + v * 8}%)`;
-      if (gp && (t === TER.GRASS || t === TER.FOREST || t === TER.BERRY || t === TER.STONE || t === TER.GOLD || t === TER.FRUIT_TREE || t === TER.VEG_PATCH || t === TER.HERB_PATCH)) {
+      } else {
+        const dr = this.drought > 0;
+        if (this._ccDrought !== dr) { this._ccDrought = dr; this._cc = []; }
+        let cc = this._cc[i];
+        if (cc === undefined) {
+          if (t === TER.SAND) cc = `hsl(42,42%,${62 + v * 5}%)`;
+          else if (t === TER.FOREST) cc = `hsl(98,34%,${24 + v * 4}%)`;
+          else if (t === TER.MOUNTAIN) cc = `hsl(30,8%,${40 + v * 12}%)`;
+          else if (t === TER.MARSH) cc = `hsl(75,28%,${26 + v * 5}%)`;
+          else if (t === TER.STONE || t === TER.GOLD) cc = `hsl(80,18%,${38 + v * 5}%)`;
+          else cc = `hsl(${86 + v * 16},${34 + (dr ? -12 : 0)}%,${33 + v * 8}%)`;
+          this._cc[i] = cc;
+        }
+        col = cc;
+      }
+      if (gp && !this.lowFX && (t === TER.GRASS || t === TER.FOREST || t === TER.BERRY || t === TER.STONE || t === TER.GOLD || t === TER.FRUIT_TREE || t === TER.VEG_PATCH || t === TER.HERB_PATCH)) {
         ctx.fillStyle = gp; ctx.fillRect(x * T, y * T, T + 1, T + 1);
         ctx.globalAlpha = 0.42; ctx.fillStyle = col; ctx.fillRect(x * T, y * T, T + 1, T + 1); ctx.globalAlpha = 1;
       } else { ctx.fillStyle = col; ctx.fillRect(x * T, y * T, T + 1, T + 1); }

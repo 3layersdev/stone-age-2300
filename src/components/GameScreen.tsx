@@ -98,6 +98,12 @@ export function GameScreen({ game, slot, onExit }: { game: Game; slot: number; o
     }
   });
   const [assetsReady, setAssetsReady] = useState(() => isAssetsReady());
+  const uiCoverRef = useRef({ menu: false, story: false, intro: false, mp: false, weather: false });
+  uiCoverRef.current.menu = menu;
+  uiCoverRef.current.story = !!story;
+  uiCoverRef.current.intro = introOpen;
+  uiCoverRef.current.mp = multiplayerOpen;
+  uiCoverRef.current.weather = weatherModalOpen;
 
   useEffect(() => {
     testConnection();
@@ -147,10 +153,14 @@ export function GameScreen({ game, slot, onExit }: { game: Game; slot: number; o
       g.onStory({ kind: "story", chapter: m.chapter, title: m.title, text: m.story });
     }
     const cv = canvasRef.current!;
-    const ctx = cv.getContext("2d")!;
+    const ctx = cv.getContext("2d", { alpha: false })!;
+    const isMobile = window.matchMedia("(pointer: coarse)").matches || window.innerWidth < 768;
+    const qdpr = isMobile ? Math.min(1.5, window.devicePixelRatio || 1) : Math.min(2, window.devicePixelRatio || 1);
+    g.lowFX = isMobile;
+    let frameNo = 0;
     let raf = 0, last = performance.now(), hudT = 0, autoT = 0, alive = true;
     const resize = () => {
-      const dpr = Math.min(2, window.devicePixelRatio || 1);
+      const dpr = qdpr;
       cv.width = window.innerWidth * dpr;
       cv.height = window.innerHeight * dpr;
       cv.style.width = window.innerWidth + "px";
@@ -186,9 +196,21 @@ export function GameScreen({ game, slot, onExit }: { game: Game; slot: number; o
       if (!alive) return;
       const dt = (now - last) / 1000;
       last = now;
+      const covered = uiCoverRef.current;
+      const blocked = covered.menu || covered.story || covered.intro || covered.mp || covered.weather;
+      frameNo++;
+      if (blocked) {
+        g.update(dt);
+        raf = requestAnimationFrame(loop);
+        return;
+      }
+      if (isMobile && (frameNo & 1)) {
+        raf = requestAnimationFrame(loop);
+        return;
+      }
       g.update(dt);
       if (isAssetsReady()) {
-        g.render(ctx, Math.min(2, window.devicePixelRatio || 1));
+        g.render(ctx, qdpr);
       }
       hudT += dt;
       autoT += dt;
@@ -1637,11 +1659,11 @@ export function GameScreen({ game, slot, onExit }: { game: Game; slot: number; o
           ========================================================================= */}
       {weatherModalOpen && (
         <div
-          className="pointer-events-auto fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-3 backdrop-blur-sm"
+          className="pointer-events-auto fixed inset-0 z-50 flex justify-center overflow-y-auto overscroll-contain bg-black/70 p-3 backdrop-blur-sm"
           onClick={() => setWeatherModalOpen(false)}
         >
           <div
-            className="hud-panel relative w-full max-w-lg rounded-lg p-4 sm:p-5 shadow-2xl border-primary/50 modal-max overflow-y-auto overscroll-contain animate-in fade-in zoom-in-95 duration-150"
+            className="hud-panel relative w-full max-w-lg rounded-lg p-4 sm:p-5 shadow-2xl border-primary/50 modal-max my-auto overflow-y-auto overscroll-contain animate-in fade-in zoom-in-95 duration-150"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
@@ -1830,8 +1852,8 @@ export function GameScreen({ game, slot, onExit }: { game: Game; slot: number; o
           GAME MENU & SOUND SETTINGS MODAL
           ========================================================================= */}
       {menu && (
-        <div className="pointer-events-auto absolute inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-md p-4">
-          <div className="hud-panel modal-max w-[min(22rem,94vw)] overflow-y-auto rounded-lg p-6 shadow-2xl border-primary/40">
+        <div className="pointer-events-auto absolute inset-0 z-50 flex justify-center overflow-y-auto overscroll-contain bg-black/75 backdrop-blur-md p-4">
+          <div className="hud-panel modal-max my-auto w-[min(22rem,94vw)] overflow-y-auto overscroll-contain rounded-lg p-6 shadow-2xl border-primary/40">
             <h2 className="mb-4 text-center font-display text-2xl font-bold bronze-text">Tribal Council Menu</h2>
             <div className="grid gap-2.5">
               <button className="bronze-btn rounded-md py-2.5 font-display text-sm font-bold text-primary cursor-pointer" onClick={() => { setMenu(false); g.paused = false; audio.play("click"); }}>

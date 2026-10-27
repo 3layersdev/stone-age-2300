@@ -18,11 +18,11 @@ export function IntroModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md pointer-events-auto">
-      <div className="hud-panel relative flex flex-col w-full max-w-2xl modal-max rounded-xl border-primary/60 shadow-[0_0_50px_rgba(234,179,8,0.25)] overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 z-50 flex justify-center overflow-y-auto overscroll-contain p-3 sm:p-4 bg-black/85 backdrop-blur-md pointer-events-auto">
+      <div className="hud-panel relative flex flex-col w-full max-w-2xl modal-max my-auto rounded-xl border-primary/60 shadow-[0_0_50px_rgba(234,179,8,0.25)] overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         {/* Banner Hero */}
-        <div className="relative border-b border-hud-edge bg-gradient-to-b from-primary/20 via-black/40 to-black/80 p-5 sm:p-6 text-center">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-primary/50 bg-black/60 shadow-[0_0_20px_rgba(234,179,8,0.4)] mb-3">
+        <div className="relative border-b border-hud-edge bg-gradient-to-b from-primary/20 via-black/40 to-black/80 p-3 sm:p-6 text-center">
+          <div className="mx-auto flex h-10 w-10 sm:h-14 sm:w-14 items-center justify-center rounded-2xl border border-primary/50 bg-black/60 shadow-[0_0_20px_rgba(234,179,8,0.4)] mb-2 sm:mb-3">
             <Castle className="h-8 w-8 text-primary animate-pulse" />
           </div>
           <h1 className="font-display text-xl sm:text-2xl font-black tracking-widest bronze-text uppercase">
@@ -79,7 +79,8 @@ export function IntroModal({
         {/* Footer Action */}
         <div className="border-t border-hud-edge p-4 bg-black/60 flex flex-col sm:flex-row items-center justify-between gap-3">
           <span className="text-[11px] text-muted-foreground font-serif text-center sm:text-left">
-            Controls: scroll or drag to pan · Ctrl+scroll to zoom · WASD also pans · Left-click to inspect & build
+            <span className="sm:hidden">Drag to pan · Pinch to zoom · Tap to inspect &amp; build</span>
+            <span className="hidden sm:inline">Controls: scroll or drag to pan · Ctrl+scroll to zoom · WASD also pans · Left-click to inspect &amp; build</span>
           </span>
           <button
             onClick={handleStart}
