@@ -2444,6 +2444,7 @@ export class Game {
       const d = BUILDINGS[b.type];
       if ((b.x + d.w) * T < this.cam.x - 50 || b.x * T > this.cam.x + this.vw / z + 50 || (b.y + d.h) * T < this.cam.y - 50 || b.y * T > this.cam.y + this.vh / z + 100) continue;
       if (b.type === "farm" || b.type === "vegGarden") drawFarmPlot(ctx, b, d);
+      else if (b.type === "garden") drawFarmPlot(ctx, b, d, "tile_flowers");
       items.push({ y: (b.y + d.h) * T, draw: () => drawBuilding(ctx, this, b, tm) });
     }
     for (const camp of this.camps) {

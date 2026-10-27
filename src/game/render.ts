@@ -681,52 +681,8 @@ function structure(c: C, g: Game, b: Building, x: number, y: number, w: number, 
       c.stroke();
       break;
     }
-    case "garden": {
-      c.fillStyle = "#70695d";
-      c.fillRect(x + 2, y + 2, w - 4, h - 4);
-      c.fillStyle = "#4a331c";
-      c.fillRect(x + 4, y + 4, w - 8, h - 8);
-
-      const flowers = [
-        { fx: x + 8, fy: y + 9, c1: "#a855f7", c2: "#c084fc" },
-        { fx: x + 16, fy: y + 8, c1: "#ef4444", c2: "#f87171" },
-        { fx: x + 24, fy: y + 9, c1: "#eab308", c2: "#fde047" },
-        { fx: x + 10, fy: y + 17, c1: "#38bdf8", c2: "#7dd3fc" },
-        { fx: x + 22, fy: y + 18, c1: "#ec4899", c2: "#f472b6" },
-        { fx: x + 16, fy: y + 23, c1: "#f8fafc", c2: "#fbbf24" },
-      ];
-      for (const f of flowers) {
-        c.fillStyle = "#365314";
-        c.fillRect(f.fx - 0.5, f.fy - 1, 1, 4);
-        c.fillStyle = f.c1;
-        c.beginPath();
-        c.arc(f.fx, f.fy, 2.6, 0, Math.PI * 2);
-        c.fill();
-        c.fillStyle = f.c2;
-        c.beginPath();
-        c.arc(f.fx, f.fy - 0.5, 1.4, 0, Math.PI * 2);
-        c.fill();
-      }
-
-      const b1x = x + 12 + Math.sin(tm * 2.2) * 7;
-      const b1y = y + 10 + Math.cos(tm * 3.1) * 5;
-      const flap1 = Math.abs(Math.sin(tm * 16)) * 2.5;
-      c.fillStyle = "#38bdf8";
-      c.beginPath();
-      c.ellipse(b1x - 1.5, b1y, flap1, 1.8, 0, 0, Math.PI * 2);
-      c.ellipse(b1x + 1.5, b1y, flap1, 1.8, 0, 0, Math.PI * 2);
-      c.fill();
-
-      const b2x = x + 20 + Math.sin(tm * 2.5 + 2) * 6;
-      const b2y = y + 16 + Math.cos(tm * 2.8 + 1) * 4;
-      const flap2 = Math.abs(Math.sin(tm * 18 + 1)) * 2.2;
-      c.fillStyle = "#facc15";
-      c.beginPath();
-      c.ellipse(b2x - 1.2, b2y, flap2, 1.5, 0, 0, Math.PI * 2);
-      c.ellipse(b2x + 1.2, b2y, flap2, 1.5, 0, 0, Math.PI * 2);
-      c.fill();
-      break;
-    }
+    case "garden":
+      break; // painted flowerbed drawn via drawFarmPlot("tile_flowers")
     case "brazier": {
       const cx = x + w / 2, cy = y + h - 6;
       c.fillStyle = "#524d45";
@@ -1575,9 +1531,9 @@ export function drawDecor(c: C, g: Game) {
   }
 }
 
-export function drawFarmPlot(c: C, b: Building, def: { w: number; h: number }) {
+export function drawFarmPlot(c: C, b: Building, def: { w: number; h: number }, img: string = "tile_farm") {
   if (!uiImgReady || !uiImg) return;
-  const fr = UFR["tile_farm"];
+  const fr = UFR[img];
   if (!fr) return;
   const [sx, sy, sw, sh] = fr;
   const w = def.w * T * 1.35, h = (sh / sw) * w;
