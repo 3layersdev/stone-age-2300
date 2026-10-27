@@ -695,6 +695,7 @@ export function GameScreen({ game, slot, onExit }: { game: Game; slot: number; o
             {/* Minimap Canvas */}
             <div className="relative mx-auto">
               <canvas
+                style={{ touchAction: "none" }}
                 ref={floatMiniRef}
                 width={MW}
                 height={MW}
@@ -1243,6 +1244,7 @@ export function GameScreen({ game, slot, onExit }: { game: Game; slot: number; o
             <div className="hud-panel rounded-md p-2 hidden md:flex flex-col justify-between shrink-0">
               <div className="relative">
                 <canvas
+                  style={{ touchAction: "none" }}
                   ref={miniRef}
                   width={MW}
                   height={MW}
