@@ -314,6 +314,27 @@ export function drawBuilding(c: C, g: Game, b: Building, tm: number) {
           c.fill();
         }
       }
+      if (b.type === "shrine_decor") {
+        // pulsing rune glow over the painted megalith
+        const mcx = x + w / 2, mcy = y + h - 20;
+        const pulse = 0.35 + 0.22 * Math.sin(tm * 2.2 + b.seed * 7);
+        const gl = c.createRadialGradient(mcx, mcy - 10, 1, mcx, mcy - 10, 14 + Math.sin(tm * 2.2 + b.seed * 7) * 3);
+        gl.addColorStop(0, `rgba(250, 204, 21, ${pulse})`);
+        gl.addColorStop(1, "rgba(250, 204, 21, 0)");
+        c.fillStyle = gl;
+        c.beginPath();
+        c.arc(mcx, mcy - 10, 17, 0, Math.PI * 2);
+        c.fill();
+        // drifting spirit motes
+        for (let k = 0; k < 3; k++) {
+          const ph = tm * 0.8 + k * 2.1 + b.seed * 5;
+          const mx = mcx + Math.sin(ph) * 7, my = mcy - 12 - ((ph * 6 + k * 14) % 26);
+          c.fillStyle = `rgba(253, 224, 71, ${0.55 - k * 0.12})`;
+          c.beginPath();
+          c.arc(mx, my, 1.3, 0, Math.PI * 2);
+          c.fill();
+        }
+      }
       if (staffed && (b.type === "kiln" || b.type === "forge" || b.type === "workshop") && Math.random() < 0.15) g.puff(x + w * 0.6, y - 4, 1, "smoke");
     } else if (!hasAtlas) {
       structure(c, g, b, x, y, w, h, tm, night);
