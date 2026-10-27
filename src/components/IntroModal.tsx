@@ -68,10 +68,10 @@ export function IntroModal({
           <div className="p-3 rounded-lg border border-hud-edge/60 bg-black/40 space-y-1">
             <div className="flex items-center gap-2 font-display text-primary font-bold">
               <Globe className="h-4 w-4" />
-              <span>DIPLOMACY & MULTIPLAYER</span>
+              <span>DIPLOMACY & SURVIVAL</span>
             </div>
             <p className="text-muted-foreground leading-snug">
-              Interact with 3 rival clans: send tribute, secure trade agreements, or form military defense pacts. Join global multiplayer lobbies backed by Firebase cloud servers.
+              Interact with 3 rival clans: send tribute, secure trade agreements, or form military defense pacts. Forge alliances that keep your people fed and your walls standing.
             </p>
           </div>
         </div>
