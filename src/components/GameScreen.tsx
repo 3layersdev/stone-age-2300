@@ -796,7 +796,7 @@ export function GameScreen({ game, slot, onExit }: { game: Game; slot: number; o
 
           {/* Age advancement progress gauge */}
           {g.ageProgress >= 0 && (
-            <div className="flex items-center gap-1 rounded bg-black/40 px-1.5 py-0.5 border border-hud-edge">
+            <div className="hidden sm:flex items-center gap-1 rounded bg-black/40 px-1.5 py-0.5 border border-hud-edge">
               <Crown className="h-3 w-3 text-warning animate-pulse" />
               <div className="flex flex-col">
                 <span className="text-[8px] sm:text-[9px] font-bold text-warning uppercase truncate max-w-[70px] sm:max-w-none">
@@ -911,7 +911,7 @@ export function GameScreen({ game, slot, onExit }: { game: Game; slot: number; o
           <button
             onClick={() => { setDiplomacyOpen(true); audio.play("click"); }}
             title="Rival Tribes & Diplomacy: tributes, trade pacts & alliances"
-            className="bronze-btn flex h-7 sm:h-8 items-center gap-1 rounded px-1.5 sm:px-2 text-xs font-display text-primary hover:text-foreground"
+            className="bronze-btn hidden md:flex h-7 sm:h-8 items-center gap-1 rounded px-1.5 sm:px-2 text-xs font-display text-primary hover:text-foreground"
           >
             <Handshake className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-emerald-400" />
             <span className="hidden xl:inline">Tribes</span>
@@ -921,7 +921,7 @@ export function GameScreen({ game, slot, onExit }: { game: Game; slot: number; o
           <button
             onClick={() => { setMultiplayerOpen(true); audio.play("click"); }}
             title="Online Lobbies, Leaderboards & Cloud Sync"
-            className="bronze-btn flex h-7 sm:h-8 items-center gap-1 rounded px-1.5 sm:px-2 text-xs font-display text-primary hover:text-foreground"
+            className="bronze-btn hidden md:flex h-7 sm:h-8 items-center gap-1 rounded px-1.5 sm:px-2 text-xs font-display text-primary hover:text-foreground"
           >
             <Globe className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-sky-400" />
             <span className="hidden xl:inline">Online</span>
@@ -931,7 +931,7 @@ export function GameScreen({ game, slot, onExit }: { game: Game; slot: number; o
           <button
             onClick={() => { setIntroOpen(true); audio.play("click"); }}
             title="Valley Lore & Survival Guide"
-            className="bronze-btn flex h-7 sm:h-8 items-center gap-1 rounded px-1.5 sm:px-2 text-xs font-display text-primary hover:text-foreground"
+            className="bronze-btn hidden md:flex h-7 sm:h-8 items-center gap-1 rounded px-1.5 sm:px-2 text-xs font-display text-primary hover:text-foreground"
           >
             <BookOpen className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-amber-200" />
           </button>
@@ -1226,6 +1226,14 @@ export function GameScreen({ game, slot, onExit }: { game: Game; slot: number; o
           title="Center Capital"
         >
           <Castle className="h-4 w-4" />
+        </button>
+        <button
+          onClick={() => { setIntroOpen(true); audio.play("click"); }}
+          aria-label="Valley Lore & Guide"
+          className="hud-panel flex h-8 w-8 items-center justify-center rounded text-amber-200 shadow-lg border-hud-edge active:scale-95"
+          title="Valley Lore & Survival Guide"
+        >
+          <BookOpen className="h-4 w-4" />
         </button>
       </div>
 

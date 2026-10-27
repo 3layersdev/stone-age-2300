@@ -2375,7 +2375,7 @@ export class Game {
         }
         col = cc;
       }
-      if (gp && !this.lowFX && (t === TER.GRASS || t === TER.FOREST || t === TER.BERRY || t === TER.STONE || t === TER.GOLD || t === TER.FRUIT_TREE || t === TER.VEG_PATCH || t === TER.HERB_PATCH)) {
+      if (gp && (t === TER.GRASS || t === TER.FOREST || t === TER.BERRY || t === TER.STONE || t === TER.GOLD || t === TER.FRUIT_TREE || t === TER.VEG_PATCH || t === TER.HERB_PATCH)) {
         ctx.fillStyle = gp; ctx.fillRect(x * T, y * T, T + 1, T + 1);
         ctx.globalAlpha = 0.42; ctx.fillStyle = col; ctx.fillRect(x * T, y * T, T + 1, T + 1); ctx.globalAlpha = 1;
       } else { ctx.fillStyle = col; ctx.fillRect(x * T, y * T, T + 1, T + 1); }
