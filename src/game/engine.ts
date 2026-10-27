@@ -92,7 +92,7 @@ export class Game {
   age = 0; ageProgress = -1; time = 0; missionIndex = 0; nid = 1; msgId = 1;
   stats = { soldiersTrained: 0, villagersTrained: 0, raidsDefeated: 0, buildingsBuilt: 0 };
   nextRaid = 300; nextDisaster = 200; raidWave = 0; raidActive = false; raidWarn = 0; raidDir = "";
-  drought = 0; flood = 0; shake = 0; lowFX = false; private _cc: string[] = []; private _ccDrought = false; disasterBanner = ""; disasterT = 0; meteor: { x: number; y: number; t: number } | null = null;
+  drought = 0; flood = 0; shake = 0; lowFX = false; private _cc: string[] = []; private _ccDrought = false; private _tc: HTMLCanvasElement | null = null; private _tcX0 = 0; private _tcY0 = 0; private _tcX1 = -1; private _tcY1 = -1; private _tcAge = -999; private _tcDrought = false; disasterBanner = ""; disasterT = 0; meteor: { x: number; y: number; t: number } | null = null;
   cam = { x: 0, y: 0 }; zoom = 1; vw = 1280; vh = 720;
   edgePan = true;
   placing: string | null = null; dragStart: { x: number; y: number } | null = null;
@@ -2352,48 +2352,71 @@ export class Game {
     const x0 = Math.max(0, Math.floor(this.cam.x / T) - 1), y0 = Math.max(0, Math.floor(this.cam.y / T) - 1);
     const x1 = Math.min(MW - 1, Math.ceil((this.cam.x + this.vw / z) / T) + 1), y1 = Math.min(MH - 1, Math.ceil((this.cam.y + this.vh / z) / T) + 1);
     const tm = this.time;
-    // ground
-    const gp = groundPattern(ctx);
-    for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) {
-      const i = y * MW + x, t = this.terrain[i], v = this.vari[i];
-      let col: string;
-      if (t === TER.WATER) {
-        const s = Math.sin(tm * 1.5 + x * 0.6 + y * 0.4) * 4;
-        col = `hsl(200,52%,${30 + v * 4 + s}%)`;
-      } else {
-        const dr = this.drought > 0;
-        if (this._ccDrought !== dr) { this._ccDrought = dr; this._cc = []; }
-        let cc = this._cc[i];
-        if (cc === undefined) {
-          if (t === TER.SAND) cc = `hsl(42,42%,${62 + v * 5}%)`;
-          else if (t === TER.FOREST) cc = `hsl(98,34%,${24 + v * 4}%)`;
-          else if (t === TER.MOUNTAIN) cc = `hsl(30,8%,${40 + v * 12}%)`;
-          else if (t === TER.MARSH) cc = `hsl(75,28%,${26 + v * 5}%)`;
-          else if (t === TER.STONE || t === TER.GOLD) cc = `hsl(80,18%,${38 + v * 5}%)`;
-          else cc = `hsl(${86 + v * 16},${34 + (dr ? -12 : 0)}%,${33 + v * 8}%)`;
-          this._cc[i] = cc;
+    // ground & roads: cached offscreen layer (rebuilt when the camera leaves the margin or periodically for edits)
+    const dr = this.drought > 0;
+    if (dr !== this._tcDrought) { this._ccDrought = dr; this._cc = []; this._tcAge = -999; this._tcDrought = dr; }
+    const MARG = 6;
+    if (!this._tc || x0 < this._tcX0 || y0 < this._tcY0 || x1 > this._tcX1 || y1 > this._tcY1 || tm - this._tcAge > 30) {
+      const cx0 = Math.max(0, x0 - MARG), cy0 = Math.max(0, y0 - MARG);
+      const cx1 = Math.min(MW - 1, x1 + MARG), cy1 = Math.min(MH - 1, y1 + MARG);
+      const cv = (this._tc ??= document.createElement("canvas"));
+      const cw = (cx1 - cx0 + 1) * T, ch = (cy1 - cy0 + 1) * T;
+      if (cv.width !== cw || cv.height !== ch) { cv.width = cw; cv.height = ch; }
+      const c2 = cv.getContext("2d")!;
+      c2.setTransform(1, 0, 0, 1, -cx0 * T, -cy0 * T);
+      c2.clearRect(cx0 * T, cy0 * T, cw, ch);
+      const gp2 = groundPattern(c2);
+      for (let y = cy0; y <= cy1; y++) for (let x = cx0; x <= cx1; x++) {
+        const i = y * MW + x, t = this.terrain[i], v = this.vari[i];
+        let col: string;
+        if (t === TER.WATER) col = `hsl(200,52%,${30 + v * 4}%)`;
+        else {
+          let cc = this._cc[i];
+          if (cc === undefined) {
+            if (t === TER.SAND) cc = `hsl(42,42%,${62 + v * 5}%)`;
+            else if (t === TER.FOREST) cc = `hsl(98,34%,${24 + v * 4}%)`;
+            else if (t === TER.MOUNTAIN) cc = `hsl(30,8%,${40 + v * 12}%)`;
+            else if (t === TER.MARSH) cc = `hsl(75,28%,${26 + v * 5}%)`;
+            else if (t === TER.STONE || t === TER.GOLD) cc = `hsl(80,18%,${38 + v * 5}%)`;
+            else cc = `hsl(${86 + v * 16},${34 + (dr ? -12 : 0)}%,${33 + v * 8}%)`;
+            this._cc[i] = cc;
+          }
+          col = cc;
         }
-        col = cc;
+        if (gp2 && (t === TER.GRASS || t === TER.FOREST || t === TER.BERRY || t === TER.STONE || t === TER.GOLD || t === TER.FRUIT_TREE || t === TER.VEG_PATCH || t === TER.HERB_PATCH)) {
+          c2.fillStyle = gp2; c2.fillRect(x * T, y * T, T + 1, T + 1);
+          c2.globalAlpha = 0.42; c2.fillStyle = col; c2.fillRect(x * T, y * T, T + 1, T + 1); c2.globalAlpha = 1;
+        } else { c2.fillStyle = col; c2.fillRect(x * T, y * T, T + 1, T + 1); }
+        if (t === TER.GRASS && v > 0.7) { c2.strokeStyle = "rgba(30,60,20,0.35)"; c2.lineWidth = 1; c2.beginPath(); const gx = x * T + v * 24, gy = y * T + 8 + v * 16; c2.moveTo(gx, gy); c2.lineTo(gx - 2, gy - 5); c2.moveTo(gx + 3, gy); c2.lineTo(gx + 4, gy - 6); c2.stroke(); }
       }
-      if (gp && (t === TER.GRASS || t === TER.FOREST || t === TER.BERRY || t === TER.STONE || t === TER.GOLD || t === TER.FRUIT_TREE || t === TER.VEG_PATCH || t === TER.HERB_PATCH)) {
-        ctx.fillStyle = gp; ctx.fillRect(x * T, y * T, T + 1, T + 1);
-        ctx.globalAlpha = 0.42; ctx.fillStyle = col; ctx.fillRect(x * T, y * T, T + 1, T + 1); ctx.globalAlpha = 1;
-      } else { ctx.fillStyle = col; ctx.fillRect(x * T, y * T, T + 1, T + 1); }
-      if (t === TER.WATER && this.tile(x, y - 1) !== TER.WATER) { ctx.fillStyle = "rgba(220,240,255,0.25)"; ctx.fillRect(x * T, y * T, T, 3 + Math.sin(tm * 2 + x) * 1.5); }
-      if (t === TER.GRASS && v > 0.7) { ctx.strokeStyle = "rgba(30,60,20,0.35)"; ctx.lineWidth = 1; ctx.beginPath(); const gx = x * T + v * 24, gy = y * T + 8 + v * 16; ctx.moveTo(gx, gy); ctx.lineTo(gx - 2, gy - 5); ctx.moveTo(gx + 3, gy); ctx.lineTo(gx + 4, gy - 6); ctx.stroke(); }
+      c2.fillStyle = "#9a7d58";
+      for (let y = cy0; y <= cy1; y++) for (let x = cx0; x <= cx1; x++) {
+        if (!this.road[y * MW + x]) continue;
+        const cx2 = x * T + T / 2, cy2 = y * T + T / 2;
+        c2.beginPath(); c2.arc(cx2, cy2, 12, 0, Math.PI * 2); c2.fill();
+        if (this.road[y * MW + x + 1]) c2.fillRect(cx2, cy2 - 12, T, 24);
+        if (this.road[(y + 1) * MW + x]) c2.fillRect(cx2 - 12, cy2, 24, T);
+      }
+      c2.fillStyle = "rgba(70,55,40,0.35)";
+      for (let y = cy0; y <= cy1; y++) for (let x = cx0; x <= cx1; x++) if (this.road[y * MW + x]) {
+        for (let k = 0; k < 4; k++) { const h = hash(x, y, k); c2.fillRect(x * T + 6 + h * 20, y * T + 6 + hash(y, x, k) * 20, 3, 2); }
+      }
+      this._tcX0 = cx0; this._tcY0 = cy0; this._tcX1 = cx1; this._tcY1 = cy1; this._tcAge = tm;
     }
-    // roads
-    ctx.fillStyle = "#9a7d58";
-    for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) {
-      if (!this.road[y * MW + x]) continue;
-      const cx = x * T + T / 2, cy = y * T + T / 2;
-      ctx.beginPath(); ctx.arc(cx, cy, 12, 0, Math.PI * 2); ctx.fill();
-      if (this.road[y * MW + x + 1]) ctx.fillRect(cx, cy - 12, T, 24);
-      if (this.road[(y + 1) * MW + x]) ctx.fillRect(cx - 12, cy, 24, T);
+    const bx0 = Math.max(x0, this._tcX0), by0 = Math.max(y0, this._tcY0), bx1 = Math.min(x1, this._tcX1), by1 = Math.min(y1, this._tcY1);
+    if (bx1 >= bx0 && by1 >= by0) {
+      ctx.drawImage(this._tc!, bx0 * T - this._tcX0 * T, by0 * T - this._tcY0 * T, (bx1 - bx0 + 1) * T, (by1 - by0 + 1) * T, bx0 * T, by0 * T, (bx1 - bx0 + 1) * T, (by1 - by0 + 1) * T);
     }
-    ctx.fillStyle = "rgba(70,55,40,0.35)";
-    for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) if (this.road[y * MW + x]) {
-      for (let k = 0; k < 4; k++) { const h = hash(x, y, k); ctx.fillRect(x * T + 6 + h * 20, y * T + 6 + hash(y, x, k) * 20, 3, 2); }
+    // live animated water shimmer (view tiles only, capped)
+    let waterN = 0;
+    for (let y = y0; y <= y1 && waterN < 220; y++) for (let x = x0; x <= x1 && waterN < 220; x++) {
+      if (this.terrain[y * MW + x] !== TER.WATER) continue;
+      waterN++;
+      const v = this.vari[y * MW + x];
+      const s = Math.sin(tm * 1.5 + x * 0.6 + y * 0.4) * 4;
+      ctx.fillStyle = `hsl(200,52%,${30 + v * 4 + s}%)`;
+      ctx.fillRect(x * T, y * T, T + 1, T + 1);
+      if (this.tile(x, y - 1) !== TER.WATER) { ctx.fillStyle = "rgba(220,240,255,0.25)"; ctx.fillRect(x * T, y * T, T, 3 + Math.sin(tm * 2 + x) * 1.5); }
     }
     // placement preview
     if (this.placing) {
