@@ -5,7 +5,7 @@ import {
   Volume2, VolumeX, Fish, Crosshair, Sparkles, PackageCheck, ShieldAlert, Bell, UserCheck, CloudRain, ZoomIn, ZoomOut,
   Snowflake, Wind, Thermometer, ShieldCheck,
   Flower2, Apple, Carrot, Layers, Grid, Footprints, Leaf,
-  Globe, Handshake, BookOpen,
+  Handshake, BookOpen,
 } from "lucide-react";
 import pVillager from "@/assets/portrait-villager.jpg";
 import pWarrior from "@/assets/portrait-warrior.jpg";
@@ -21,9 +21,7 @@ import { isAssetsReady, preloadGameAssets } from "@/game/render";
 import { TechTreeModal } from "./TechTreeModal";
 import { uiSpriteStyle, PAINTED_RES } from "../game/uiSprite";
 import { DiplomacyModal } from "./DiplomacyModal";
-import { MultiplayerModal } from "./MultiplayerModal";
 import { IntroModal } from "./IntroModal";
-import { testConnection, ensureAuthUser } from "@/lib/firebase";
 
 const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   house: Home, farm: Wheat, fishery: Fish, lumber: Axe, quarry: Pickaxe, clayPit: Shovel,
@@ -89,7 +87,6 @@ export function GameScreen({ game, slot, onExit }: { game: Game; slot: number; o
   const [weatherModalOpen, setWeatherModalOpen] = useState(false);
   const [techOpen, setTechOpen] = useState(false);
   const [diplomacyOpen, setDiplomacyOpen] = useState(false);
-  const [multiplayerOpen, setMultiplayerOpen] = useState(false);
   const [introOpen, setIntroOpen] = useState(() => {
     try {
       return !localStorage.getItem("stone_age_intro_seen");
@@ -98,16 +95,13 @@ export function GameScreen({ game, slot, onExit }: { game: Game; slot: number; o
     }
   });
   const [assetsReady, setAssetsReady] = useState(() => isAssetsReady());
-  const uiCoverRef = useRef({ menu: false, story: false, intro: false, mp: false, weather: false });
+  const uiCoverRef = useRef({ menu: false, story: false, intro: false, weather: false });
   uiCoverRef.current.menu = menu;
   uiCoverRef.current.story = !!story;
   uiCoverRef.current.intro = introOpen;
-  uiCoverRef.current.mp = multiplayerOpen;
   uiCoverRef.current.weather = weatherModalOpen;
 
-  useEffect(() => {
-    testConnection();
-  }, []);
+
   const [uiScale, setUiScale] = useState<number>(() => {
     try {
       const s = localStorage.getItem("stone_age_ui_scale");
@@ -196,7 +190,7 @@ export function GameScreen({ game, slot, onExit }: { game: Game; slot: number; o
       if (!alive) return;
       const dt = (now - last) / 1000;
       const covered = uiCoverRef.current;
-      const blocked = covered.menu || covered.story || covered.intro || covered.mp || covered.weather;
+      const blocked = covered.menu || covered.story || covered.intro || covered.weather;
       frameNo++;
       if (blocked) {
         last = now;
@@ -917,15 +911,6 @@ export function GameScreen({ game, slot, onExit }: { game: Game; slot: number; o
             <span className="hidden xl:inline">Tribes</span>
           </button>
 
-          {/* Multiplayer & Cloud Leaderboard Trigger */}
-          <button
-            onClick={() => { setMultiplayerOpen(true); audio.play("click"); }}
-            title="Online Lobbies, Leaderboards & Cloud Sync"
-            className="bronze-btn hidden md:flex h-7 sm:h-8 items-center gap-1 rounded px-1.5 sm:px-2 text-xs font-display text-primary hover:text-foreground"
-          >
-            <Globe className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-sky-400" />
-            <span className="hidden xl:inline">Online</span>
-          </button>
 
           {/* Lore & Survival Guide Trigger */}
           <button
@@ -1202,14 +1187,6 @@ export function GameScreen({ game, slot, onExit }: { game: Game; slot: number; o
           title="Rival Tribes & Diplomacy"
         >
           <Handshake className="h-4 w-4" />
-        </button>
-        <button
-          onClick={() => { setMultiplayerOpen(true); audio.play("click"); }}
-          aria-label="Online Lobbies"
-          className="hud-panel flex h-8 w-8 items-center justify-center rounded text-sky-400 shadow-lg border-hud-edge active:scale-95"
-          title="Online Lobbies & Leaderboard"
-        >
-          <Globe className="h-4 w-4" />
         </button>
         <button
           onClick={() => g.zoomAt(g.vw / 2, g.vh / 2, -200)}
@@ -1980,13 +1957,6 @@ export function GameScreen({ game, slot, onExit }: { game: Game; slot: number; o
         />
       )}
 
-      {/* Firebase Cloud Multiplayer & Global Leaderboard */}
-      {multiplayerOpen && (
-        <MultiplayerModal
-          game={g}
-          onClose={() => setMultiplayerOpen(false)}
-        />
-      )}
 
       {/* Valley Lore & Survival Intro Guide */}
       {introOpen && (
