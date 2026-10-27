@@ -1,7 +1,7 @@
 import { AGES, BUILDINGS, RES_COLOR, MAP_SIZES, MH, MW, NAMES, RANKS, T, TER, UNITS, setMapSize, type MapSize, type Res, type ResKey } from "./data";
 import { unlockChapter } from "./save";
 import { MISSIONS } from "./missions";
-import { drawBuilding, drawUnit, groundPattern, natureSprite, drawAnimal, drawCamp, drawDecor, drawFarmPlot, drawRingFx, drawSpriteParts } from "./render";
+import { drawRoadTile, drawBuilding, drawUnit, groundPattern, natureSprite, drawAnimal, drawCamp, drawDecor, drawFarmPlot, drawRingFx, drawSpriteParts } from "./render";
 import { audio } from "./audio";
 import { WeatherSystem, WEATHER_CONFIGS, type WeatherType } from "./weather";
 import { TECHNOLOGIES, type TechItem } from "./techTree";
@@ -2397,9 +2397,8 @@ export class Game {
         if (this.road[y * MW + x + 1]) c2.fillRect(cx2, cy2 - 12, T, 24);
         if (this.road[(y + 1) * MW + x]) c2.fillRect(cx2 - 12, cy2, 24, T);
       }
-      c2.fillStyle = "rgba(70,55,40,0.35)";
       for (let y = cy0; y <= cy1; y++) for (let x = cx0; x <= cx1; x++) if (this.road[y * MW + x]) {
-        for (let k = 0; k < 4; k++) { const h = hash(x, y, k); c2.fillRect(x * T + 6 + h * 20, y * T + 6 + hash(y, x, k) * 20, 3, 2); }
+        drawRoadTile(c2, hash(x, y, 7) * 4 | 0, x * T, y * T, T);
       }
       this._tcX0 = cx0; this._tcY0 = cy0; this._tcX1 = cx1; this._tcY1 = cy1; this._tcAge = tm;
     }

@@ -3,6 +3,7 @@ import atlasUrl from "@/assets/buildings-atlas.webp";
 import frames from "./atlas.json";
 import natureUrl from "@/assets/nature-atlas.webp";
 import grassUrl from "@/assets/grass-tex.webp";
+import roadTilesUrl from "@/assets/road-tiles.webp";
 import natureFrames from "./nature.json";
 import unitsAtlasUrl from "@/assets/units-atlas.webp";
 import animalAtlasUrl from "@/assets/animals-atlas.webp";
@@ -102,6 +103,14 @@ function loadNature() {
     preloadGameAssets();
   }
 }
+let roadImg: HTMLImageElement | null = null; let roadReady = false;
+if (typeof Image !== "undefined") { roadImg = new Image(); roadImg.onload = () => { roadReady = true; }; roadImg.src = roadTilesUrl; }
+export function drawRoadTile(c: C, variant: number, dx: number, dy: number, size: number) {
+  if (!roadReady || !roadImg) return false;
+  c.drawImage(roadImg, variant * 96, 0, 96, 96, dx, dy, size, size);
+  return true;
+}
+
 export function groundPattern(c: C) {
   loadNature();
   if (!pattern && grassReady && grass) { pattern = c.createPattern(grass, "repeat"); pattern?.setTransform(new DOMMatrix().scale(0.5)); }
@@ -266,6 +275,45 @@ export function drawBuilding(c: C, g: Game, b: Building, tm: number) {
     const hasAtlas = !!spriteKey(g, b);
     if (sprite(c, g, b, x, y, w, h, tm, staffed)) {
       if (night && b.type !== "road") { const gl = c.createRadialGradient(x + w / 2, y + h * 0.6, 2, x + w / 2, y + h * 0.6, w * 0.7); gl.addColorStop(0, "rgba(255,190,90,0.35)"); gl.addColorStop(1, "rgba(255,190,90,0)"); c.fillStyle = gl; c.fillRect(x - w * 0.2, y - h * 0.2, w * 1.4, h * 1.4); }
+      if (b.type === "totem") {
+        // living aura over the painted totem
+        const tcx = x + w / 2, tcy = y + h - 14;
+        const aura = 0.35 + 0.25 * Math.sin(tm * 3);
+        c.strokeStyle = `rgba(56, 189, 248, ${aura})`;
+        c.lineWidth = 1.2;
+        c.beginPath();
+        c.arc(tcx, tcy, 14 + Math.sin(tm * 2) * 2, 0, Math.PI * 2);
+        c.stroke();
+        const sway = Math.sin(tm * 3 + b.seed) * 2.5;
+        c.strokeStyle = "rgba(56,189,248,0.8)"; c.lineWidth = 1.6;
+        c.beginPath(); c.moveTo(tcx - 6, tcy - 11); c.lineTo(tcx - 10 + sway, tcy - 3); c.stroke();
+        c.strokeStyle = "rgba(250,204,21,0.85)";
+        c.beginPath(); c.moveTo(tcx + 6, tcy - 11); c.lineTo(tcx + 10 + sway, tcy - 3); c.stroke();
+      }
+      if (b.type === "brazier") {
+        // animated flame over the painted brazier pit
+        const fcx = x + w / 2, fcy = y + h - 16;
+        const flW = 6 + Math.sin(tm * 9) * 1.2;
+        const flH = 10 + Math.sin(tm * 11) * 2;
+        const fgr = c.createRadialGradient(fcx, fcy - 2, 1, fcx, fcy - 5, flH);
+        fgr.addColorStop(0, "rgba(255, 255, 220, 0.95)");
+        fgr.addColorStop(0.35, "rgba(251, 146, 60, 0.9)");
+        fgr.addColorStop(0.75, "rgba(220, 38, 38, 0.6)");
+        fgr.addColorStop(1, "rgba(153, 27, 27, 0)");
+        c.fillStyle = fgr;
+        c.beginPath();
+        c.ellipse(fcx, fcy - 4, flW, flH, 0, 0, Math.PI * 2);
+        c.fill();
+        if (night) {
+          const lgr = c.createRadialGradient(fcx, fcy - 4, 2, fcx, fcy - 4, 40);
+          lgr.addColorStop(0, "rgba(254, 215, 170, 0.4)");
+          lgr.addColorStop(1, "rgba(254, 215, 170, 0)");
+          c.fillStyle = lgr;
+          c.beginPath();
+          c.arc(fcx, fcy - 4, 40, 0, Math.PI * 2);
+          c.fill();
+        }
+      }
       if (staffed && (b.type === "kiln" || b.type === "forge" || b.type === "workshop") && Math.random() < 0.15) g.puff(x + w * 0.6, y - 4, 1, "smoke");
     } else if (!hasAtlas) {
       structure(c, g, b, x, y, w, h, tm, night);
