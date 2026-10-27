@@ -269,7 +269,7 @@ export function StartMenu({ onNew, onLoad }: Props) {
             {panel === "help" && (
               <div className="space-y-2.5 text-xs sm:text-sm leading-relaxed">
                 <h3 className="font-display text-xl sm:text-2xl bronze-text">Survival Guide</h3>
-                <p><b className="text-primary">Camera:</b> WASD / arrows / screen edges to pan, mouse wheel to zoom, Space to return home. On touch: drag to pan, pinch to zoom, tap to select or build, long-press to send units or cancel.</p>
+                <p><b className="text-primary">Camera:</b> scroll or right-drag to pan, Ctrl+scroll to zoom, WASD / arrows / screen edges also pan, Space to return home. On touch: drag to pan, pinch to zoom, tap to select or build, long-press to send units or cancel.</p>
                 <p><b className="text-primary">Build:</b> pick a building from the command card (bottom-right) or press its hotkey, then click the map. Drag for roads and palisades. Shift-click to keep placing. Right-click cancels.</p>
                 <p><b className="text-primary">Villagers</b> work by themselves: they build, repair, fight fires, gather and carry goods. Camps must be placed near forest, stone or gold.</p>
                 <p><b className="text-primary">Upgrades:</b> select a building and press Upgrade (U). Tier 2 needs tools from a Workshop, tier 3 also needs the Bronze Age. Gold diamonds show a building's tier.</p>

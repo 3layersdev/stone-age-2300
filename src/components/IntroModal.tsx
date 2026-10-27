@@ -79,7 +79,7 @@ export function IntroModal({
         {/* Footer Action */}
         <div className="border-t border-hud-edge p-4 bg-black/60 flex flex-col sm:flex-row items-center justify-between gap-3">
           <span className="text-[11px] text-muted-foreground font-serif text-center sm:text-left">
-            Controls: WASD or drag to pan · Scroll to zoom · Left-click to inspect & build
+            Controls: scroll or drag to pan · Ctrl+scroll to zoom · WASD also pans · Left-click to inspect & build
           </span>
           <button
             onClick={handleStart}

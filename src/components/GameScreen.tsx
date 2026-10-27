@@ -263,8 +263,16 @@ export function GameScreen({ game, slot, onExit }: { game: Game; slot: number; o
     const leave = () => { g.hover.sx = -1; };
     const wheel = (e: WheelEvent) => {
       e.preventDefault();
-      const dy = e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? 100 : 1);
-      g.zoomAt(e.clientX, e.clientY, dy);
+      const k = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? 100 : 1;
+      if (e.ctrlKey) {
+        // Ctrl + wheel / trackpad pinch: zoom
+        g.zoomAt(e.clientX, e.clientY, e.deltaY * k);
+        return;
+      }
+      // Plain wheel / two-finger scroll: pan the map (natural direction)
+      const spd = 1.35 / g.zoom;
+      g.cam.x += (e.deltaX || 0) * k * spd;
+      g.cam.y += e.deltaY * k * spd;
     };
     const ctxm = (e: Event) => e.preventDefault();
 
